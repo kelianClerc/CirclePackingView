@@ -64,11 +64,19 @@ class CirclePackingView @JvmOverloads constructor(
     }
 
     private fun loadAndResizeBitmap(height: Int): Bitmap? {
-        val dr = resources.getDrawable(R.drawable.ic_fabernovel_logo)
+        val dr = resources.getDrawable(R.drawable.data)
         val bitmap = dr.toBitmap()
-        val imageRatio = bitmap.width.toFloat() / bitmap.height
-        val scaledHeight = (height * HEIGHT_RATIO).roundToInt()
-        val scaledWidth = (scaledHeight * imageRatio).roundToInt()
+        val widthHeightRatio = bitmap.width.toFloat() / bitmap.height
+
+        val (scaledWidth, scaledHeight) = if (widthHeightRatio > 1) {
+            val nextWidth = (width * IMAGE_LARGEST_SIZE_RATIO).roundToInt()
+            val nextHeight =  (nextWidth / widthHeightRatio).roundToInt()
+            Pair(nextWidth, nextHeight)
+        } else {
+            val nextHeight =  (height * IMAGE_LARGEST_SIZE_RATIO).roundToInt()
+            val nextWidth = (nextHeight * widthHeightRatio).roundToInt()
+            Pair(nextWidth, nextHeight)
+        }
 
         return Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true)
     }
@@ -165,7 +173,7 @@ class CirclePackingView @JvmOverloads constructor(
         private const val NUMBER_OF_CIRCLE = 1000
         private const val ATTEMPT_THRESHOLD = 500
         private const val CIRCLE_ADDED_PER_CYCLE = 3
-        private const val HEIGHT_RATIO = 0.6
+        private const val IMAGE_LARGEST_SIZE_RATIO = 0.6
     }
 
     data class Spot(val x: Int, val y: Int)
