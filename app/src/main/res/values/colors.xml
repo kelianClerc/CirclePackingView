@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/azure_radiance</color>
+    <color name="colorPrimaryDark">@color/black</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <!-- Install the plugin or use the website below to name the colors -->
+    <!-- https://github.com/galex/name-that-color-intellij-plugin -->
+    <!-- http://chir.ag/projects/name-that-color/ -->
+    <!-- Use refs.xml to make reference to colors if needed. -->
+    <color name="azure_radiance">#008afd</color>
+    <color name="science_blue">#0071cf</color>
+    <color name="silver">#cccccc</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000</color>
+
+    <color name="dark_blue">#19243a</color>
+    <color name="light_grey_blue">#a9aebc</color>
+    <color name="light_grey">#9fa4b2</color>
+
+    <!-- TODO : Remove V1 design colors and remove -v2 suffix -->
+    <color name="light_grey_v2">#c8c0c0</color>
+
+    <color name="transparent">#00ffffff</color>
+</resources>
