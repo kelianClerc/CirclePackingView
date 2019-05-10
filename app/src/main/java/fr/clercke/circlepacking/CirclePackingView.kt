@@ -3,12 +3,10 @@ package fr.clercke.circlepacking
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.INFINITE
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import kotlin.math.roundToInt
@@ -34,6 +32,36 @@ class CirclePackingView @JvmOverloads constructor(
     private val circleStrokeWidth = resources.getDimensionPixelSize(R.dimen.circle_stroke_width)
     private val backgroundPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.black)
+    }
+    @DrawableRes private val drawableMask: Int
+    private val drawablePadding: Float
+    var numberOfCircles = NUMBER_OF_CIRCLE
+    var circleAddedEachCycle = CIRCLE_ADDED_PER_CYCLE
+
+    init {
+        val typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.CirclePackingView)
+        val viewBackgroundColor = typedArray.getColor(
+                R.styleable.CirclePackingView_cp_background_color,
+                Color.BLACK
+        )
+        backgroundPaint.color = viewBackgroundColor
+        drawableMask = typedArray.getResourceId(
+                R.styleable.CirclePackingView_cp_mask,
+                R.drawable.ic_fabernovel_logo
+        )
+        drawablePadding = typedArray.getFloat(
+                R.styleable.CirclePackingView_cp_padding,
+                IMAGE_LARGEST_SIZE_RATIO
+        )
+        numberOfCircles = typedArray.getInteger(
+                R.styleable.CirclePackingView_cp_circle_max_number,
+                NUMBER_OF_CIRCLE
+        )
+        circleAddedEachCycle = typedArray.getInteger(
+                R.styleable.CirclePackingView_cp_circle_added_each_cycle,
+                CIRCLE_ADDED_PER_CYCLE
+        )
+        typedArray.recycle()
     }
 
     override fun onSizeChanged(width: Int, height: Int, oldw: Int, oldh: Int) {
@@ -65,16 +93,18 @@ class CirclePackingView @JvmOverloads constructor(
     }
 
     private fun loadAndResizeBitmap(height: Int): Bitmap? {
-        val dr = resources.getDrawable(R.drawable.ic_fabernovel_logo)
+        val dr = ContextCompat.getDrawable(context, drawableMask)
+        if (dr == null) return null
+
         val bitmap = dr.toBitmap()
         val widthHeightRatio = bitmap.width.toFloat() / bitmap.height
 
-        val (scaledWidth, scaledHeight) = if (widthHeightRatio > 1) {
-            val nextWidth = (width * IMAGE_LARGEST_SIZE_RATIO).roundToInt()
+        val (scaledWidth, scaledHeight) = if (widthHeightRatio >= 1) {
+            val nextWidth = (width * drawablePadding).roundToInt()
             val nextHeight =  (nextWidth / widthHeightRatio).roundToInt()
             Pair(nextWidth, nextHeight)
         } else {
-            val nextHeight =  (height * IMAGE_LARGEST_SIZE_RATIO).roundToInt()
+            val nextHeight =  (height * drawablePadding).roundToInt()
             val nextWidth = (nextHeight * widthHeightRatio).roundToInt()
             Pair(nextWidth, nextHeight)
         }
@@ -106,7 +136,7 @@ class CirclePackingView @JvmOverloads constructor(
     }
 
     private fun addABunchOfCircles() {
-        if (circles.size < NUMBER_OF_CIRCLE) {
+        if (circles.size < numberOfCircles) {
             var count = 0
             var attempt = 0
             do {
@@ -114,7 +144,7 @@ class CirclePackingView @JvmOverloads constructor(
                 if (tryToAddACircle()) {
                     count++
                 }
-            } while (count < CIRCLE_ADDED_PER_CYCLE && attempt < ATTEMPT_THRESHOLD)
+            } while (count < circleAddedEachCycle && attempt < ATTEMPT_THRESHOLD)
         }
     }
 
@@ -166,7 +196,7 @@ class CirclePackingView @JvmOverloads constructor(
     }
 
     fun dispose() {
-        animation?.end()
+        animation?.cancel()
         animation = null
     }
 
@@ -174,7 +204,7 @@ class CirclePackingView @JvmOverloads constructor(
         private const val NUMBER_OF_CIRCLE = 1000
         private const val ATTEMPT_THRESHOLD = 500
         private const val CIRCLE_ADDED_PER_CYCLE = 3
-        private const val IMAGE_LARGEST_SIZE_RATIO = 0.6
+        private const val IMAGE_LARGEST_SIZE_RATIO = 0.6f
     }
 
     data class Spot(val x: Int, val y: Int)
