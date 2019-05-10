@@ -31,6 +31,7 @@ class CirclePackingView @JvmOverloads constructor(
         ContextCompat.getColor(context, R.color.light_grey_v2),
         ContextCompat.getColor(context, R.color.silver)
     )
+    private val circleStrokeWidth = resources.getDimensionPixelSize(R.dimen.circle_stroke_width)
     private val backgroundPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.black)
     }
@@ -64,7 +65,7 @@ class CirclePackingView @JvmOverloads constructor(
     }
 
     private fun loadAndResizeBitmap(height: Int): Bitmap? {
-        val dr = resources.getDrawable(R.drawable.data)
+        val dr = resources.getDrawable(R.drawable.ic_fabernovel_logo)
         val bitmap = dr.toBitmap()
         val widthHeightRatio = bitmap.width.toFloat() / bitmap.height
 
@@ -140,7 +141,7 @@ class CirclePackingView @JvmOverloads constructor(
             if (other == circle) continue
 
             val dist = dist(circle.x, circle.y, other.x, other.y)
-            if (dist - Circle.STROKE_WIDTH <= circle.radius + other.radius) {
+            if (dist - circle.config.strokeWidthPx <= circle.radius + other.radius) {
                 other.shouldGrow = false
                 circle.shouldGrow = false
             }
@@ -156,7 +157,7 @@ class CirclePackingView @JvmOverloads constructor(
             return false
         }
 
-        circles.add(Circle(x, y, circleColorList.random()))
+        circles.add(Circle(x, y, Circle.Config(circleColorList.random(), circleStrokeWidth)))
         return true
     }
 

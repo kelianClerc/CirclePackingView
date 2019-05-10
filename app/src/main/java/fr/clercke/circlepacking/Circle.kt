@@ -5,23 +5,22 @@ import android.graphics.Paint
 import androidx.annotation.ColorInt
 
 
-class Circle constructor(var x: Float, var y: Float, @ColorInt circleColor: Int) {
+class Circle constructor(var x: Float, var y: Float, val config: Config) {
     var radius = DEFAULT_RADIUS
         private set
     var shouldGrow = true
 
-
     private val circlePaint = Paint().apply {
-        color = circleColor
+        color = config.circleColor
         style = Paint.Style.STROKE
-        strokeWidth = STROKE_WIDTH
+        strokeWidth = config.strokeWidthPx.toFloat()
     }
 
     fun isTouchingEdge(width: Int, height: Int): Boolean {
-        return x + radius - STROKE_WIDTH > width
-            || x - radius - STROKE_WIDTH < 0
-            || y + radius - STROKE_WIDTH > height
-            || y - radius - STROKE_WIDTH < 0
+        return x + radius - config.strokeWidthPx > width
+            || x - radius - config.strokeWidthPx < 0
+            || y + radius - config.strokeWidthPx > height
+            || y - radius - config.strokeWidthPx < 0
     }
 
     fun grow(step: Float = 1f) {
@@ -34,6 +33,10 @@ class Circle constructor(var x: Float, var y: Float, @ColorInt circleColor: Int)
 
     companion object {
         private const val DEFAULT_RADIUS = 1f
-        const val STROKE_WIDTH = 4f
     }
+
+    data class Config(
+        @ColorInt val circleColor: Int,
+        val strokeWidthPx: Int
+    )
 }
